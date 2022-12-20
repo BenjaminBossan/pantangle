@@ -27,7 +27,7 @@ The idea to "tangle" code from documents is taken from [Emacs org mode](https://
 
 ## Development
 
-Changes to the [`pantangle.py`](https://github.com/BenjaminBossan/pantangle/blob/main/pantangle.md) script should _not_ be made inside this script directly, but inside of `pantangle.md`, which is treated as the source of truth. It is written using literate programming. The script is then created by calling itself on the modified markdown file.
+Changes to the `pantangle.py` script should _not_ be made inside this script directly, but inside of [`pantangle.md`](https://github.com/BenjaminBossan/pantangle/blob/main/pantangle.md), which is treated as the source of truth. It is written using literate programming. The script is then created by calling itself on the modified markdown file.
 
 So once `pantangle.md` has been changed, run:
 
