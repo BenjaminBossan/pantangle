@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import subprocess
 import sys
-from typing import Any, Iterator
+from typing import Any, Callable, Iterator
 
 # CODE BLOCK DELIMITER
 
@@ -55,14 +55,14 @@ def tangle(source: str) -> Iterator[str]:
 CODE_BLOCK_DELIMITER = "\n# CODE BLOCK DELIMITER\n"
 
 
-def main(file_name: str) -> None:
+def main(file_name: str, sink: Callable[[str], None] = print) -> None:
     source = read_source(file_name)
     tangled = tangle(source)
     lines = interleave(tangled, CODE_BLOCK_DELIMITER)
 
-    print(f"# CODE TANGLED FROM '{file_name}'\n")
+    sink(f"# CODE TANGLED FROM '{file_name}'\n")
     for line in lines:
-        print(line)
+        sink(line)
 
 # CODE BLOCK DELIMITER
 

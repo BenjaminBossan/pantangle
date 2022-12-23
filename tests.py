@@ -1,4 +1,3 @@
-import subprocess
 import textwrap
 import tempfile
 from pathlib import Path
@@ -84,14 +83,17 @@ def run_test(suffix, inp):
     with open(f_name, "w") as f:
         f.write(inp)
 
-    proc = subprocess.run(
-        ["python", "pantangle.py", str(f_name)],
-        capture_output=True,
-    )
-    result = str(proc.stdout.decode("utf-8"))
+    from pantangle import main
+
+    results = []
+    main(f_name, sink=results.append)
+    results.append("")
+    result = "\n".join(results)
+
     assert result == expected
 
 
 if __name__ == "__main__":
     for suffix, inp in inputs:
         run_test(suffix, inp)
+    print(f"All {len(inputs)} tests ran successfully")
