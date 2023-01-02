@@ -23,8 +23,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        wget https://github.com/jgm/pandoc/releases/download/2.19.2/pandoc-2.19.2-1-amd64.deb -o pandoc.deb
-        sudo dpkg -i pandoc.deb
+        wget https://github.com/jgm/pandoc/releases/download/2.19.2/pandoc-2.19.2-1-amd64.deb
+        sudo dpkg -i pandoc-2.19.2-1-amd64.deb
 
     - name: Tangled pantangle.md identical to pantangle.py
       run: |
