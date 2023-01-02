@@ -1,15 +1,13 @@
 # CODE TANGLED FROM 'pantangle.md'
 
-from __future__ import annotations
-
 import json
 import subprocess
 import sys
-from typing import Any, Callable, Iterator
+from typing import Any, Callable, Dict, Iterator, Tuple
 
 # CODE BLOCK DELIMITER
 
-CodeBlockItem = dict[str, tuple[tuple[Any, str, Any], str]]
+CodeBlockItem = Dict[str, Tuple[Tuple[Any, str, Any], str]]
 
 # CODE BLOCK DELIMITER
 
