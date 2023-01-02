@@ -11,7 +11,7 @@ jobs:
     if: "github.repository == 'BenjaminBossan/pantangle'"
     strategy:
       matrix:
-        python: ["3.6", "3.11"]
+        python: ["3.7", "3.11"]
 
     steps:
     - uses: actions/checkout@v3
@@ -23,8 +23,8 @@ jobs:
 
     - name: Install dependencies
       run: |
-        wget https://github.com/jgm/pandoc/releases/download/2.19.2/pandoc-2.19.2-1-amd64.deb
-        sudo dpkg -i https://github.com/jgm/pandoc/releases/download/2.19.2/pandoc-2.19.2-1-amd64.deb
+        wget https://github.com/jgm/pandoc/releases/download/2.19.2/pandoc-2.19.2-1-amd64.deb -o pandoc.deb
+        sudo dpkg -i pandoc.deb
 
     - name: Tangled pantangle.md identical to pantangle.py
       run: |
