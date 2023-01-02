@@ -17,7 +17,7 @@ def read_source(file_name: str) -> str:
         capture_output=True,
     )
     source = str(proc.stdout.decode("utf-8"))
-    return source
+    return source#XXX
 
 # CODE BLOCK DELIMITER
 
