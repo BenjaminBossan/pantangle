@@ -50,7 +50,7 @@ inputs = [
 
         .. code:: python
 
-           class Bar():
+           class Bar():#XXX
              def __init__(self):
                self.bar = 456
 
