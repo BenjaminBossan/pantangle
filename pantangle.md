@@ -7,12 +7,10 @@ Using literator programming to document the script. The actual `pantangle.py` sc
 First the imports. Only use the standard library to make it possible to run the script on as many systems as possible.
 
 ```python
-from __future__ import annotations
-
 import json
 import subprocess
 import sys
-from typing import Any, Callable, Iterator
+from typing import Any, Callable, Dict, Iterator, Tuple
 ```
 
 ## Custom type
@@ -20,7 +18,7 @@ from typing import Any, Callable, Iterator
 A type to represent the CodeBlock item returned by pandoc
 
 ```python
-CodeBlockItem = dict[str, tuple[tuple[Any, str, Any], str]]
+CodeBlockItem = Dict[str, Tuple[Tuple[Any, str, Any], str]]
 ```
 
 ## Functions

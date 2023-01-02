@@ -1,0 +1,38 @@
+name: pytest
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  tests:
+
+    runs-on: ubuntu-latest
+    if: "github.repository == 'BenjaminBossan/pantangle'"
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.7", "3.8", "3.9", "3.10", "3.11"]
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python }}
+
+    - name: Install dependencies
+      run: |
+        wget -q https://github.com/jgm/pandoc/releases/download/2.19.2/pandoc-2.19.2-1-amd64.deb
+        sudo dpkg -i pandoc-2.19.2-1-amd64.deb
+        pandoc --version
+        python --version
+
+    - name: Tangled pantangle.md identical to pantangle.py
+      run: |
+        python pantangle.py pantangle.md > actual.py && diff actual.py pantangle.py
+
+    - name: Run tests
+      run: |
+        python tests.py
