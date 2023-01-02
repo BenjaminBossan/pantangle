@@ -17,7 +17,7 @@ The script should work _as is_, so just copy it from the repo, no need to instal
 
 However, it does require pandoc and Python, so you need to have them on your system. To install pandoc, follow [these instructions](https://pandoc.org/installing.html), for Python, look [here](https://www.python.org/downloads/).
 
-The scrip is tested, and thus confirmed to work, with Python versions 3.7 to 3.11 and with pandoc version 2.19.
+The script is tested, and thus confirmed to work, with Python versions 3.7 to 3.11 and with pandoc version 2.19.
 
 ## Limitations
 
