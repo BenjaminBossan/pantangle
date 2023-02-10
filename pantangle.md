@@ -10,15 +10,18 @@ First the imports. Only use the standard library to make it possible to run the 
 import json
 import subprocess
 import sys
-from typing import Any, Callable, Dict, Iterator, Tuple
+from typing import Any, Callable, Dict, Iterator, List, Tuple, Union, cast
 ```
 
 ## Custom type
 
-A type to represent the CodeBlock item returned by pandoc
+A type to represent the CodeBlock item or a generic item returned by pandoc
 
 ```python
 CodeBlockItem = Dict[str, Tuple[Tuple[Any, str, Any], str]]
+GenericItem = Union[
+    int, str, CodeBlockItem, List["GenericItem"], Dict[str, List["GenericItem"]]
+]
 ```
 
 ## Functions
@@ -47,6 +50,30 @@ def process_code_block(item: CodeBlockItem) -> str:
     return content
 ```
 
+For Jupyter notebooks, the outputs of expressions are returned as code blocks too, but we don't want them to be tangled. Therefore, it is checked if an item is a Jupyter output cell. This seems to be a more or less sane way of checking.
+
+```python
+def is_jupyter_output_cell(items: List[GenericItem]) -> bool:
+    if len(items) < 2:
+        return False
+
+    item0 = items[0]
+    if not isinstance(item0, list):
+        return False
+
+    if len(item0) < 2:
+        return False
+
+    item1 = item0[1]
+    if not isinstance(item1, list):
+        return False
+
+    if len(item1) < 1:
+        return False
+
+    return item1[0] == "output"
+```
+
 Helper function to interleave the code blocks with a unique delimiter. This makes it easier to later map back the code blocks to the original document. There are possibly better ways that would allow to automate the "detangling" process.
 
 ```python
@@ -61,16 +88,40 @@ def interleave(iterator: Iterator[str], value: str) -> Iterator[str]:
         yield item
 ```
 
-The actual function that tangles the code blocks. It ignores all types that are not code blocks and only yields those.
+The actual function that tangles the code blocks. For each block, a recursive function is called that inspects its type. If an int or str, nothing is done. If a list, call itself on each member of the list. If a dict, check if it's a code block. If it is, its content will be yielded for tangling. If it's not a code block dict, call this function recursively on its values.
+
+It ignores all types that are not code blocks and only yields those.
 
 ```python
+def _tangle(item: GenericItem) -> Iterator[str]:
+    if isinstance(item, (int, str)):
+        return
+
+    if isinstance(item, list):
+        for subitem in item:
+            yield from _tangle(subitem)
+    else:  # dict
+        type_ = item.get("t")
+        if not type_:
+            return
+
+        if type_ == "CodeBlock":  # type: ignore
+            item = cast(CodeBlockItem, item)  # for mypy
+            res = process_code_block(item)
+            yield res
+        else:
+            item = cast(Dict[str, List[GenericItem]], item)  # for mypy
+            content: List[GenericItem] = item.get("c", [])
+            if is_jupyter_output_cell(content):
+                return
+
+            for subitem in content:
+                yield from _tangle(subitem)
+
+
 def tangle(source: str) -> Iterator[str]:
     for item in json.loads(source)["blocks"]:
-        if item["t"] != "CodeBlock":
-            continue
-
-        res = process_code_block(item)
-        yield res
+        yield from _tangle(item)
 ```
 
 The main file that glues the different parts together: reading the source, tangling it, interleaving, and printing to stdout.

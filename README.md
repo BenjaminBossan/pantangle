@@ -21,7 +21,7 @@ The script is tested, and thus confirmed to work, with Python versions 3.7 to 3.
 
 ## Limitations
 
-This should work on any document type [supported by pandoc](https://pandoc.org/MANUAL.html#general-options), so markdown, reStructuredText, org, asciidoc, etc. should work. However, it's only tested on markdown and reStructuredText so far.
+This should work on any document type [supported by pandoc](https://pandoc.org/MANUAL.html#general-options), so markdown, reStructuredText, org, asciidoc, etc. should work. However, it's only tested on markdown, reStructuredText, and jupyter notebooks so far.
 
 ## Background
 

@@ -3,11 +3,14 @@
 import json
 import subprocess
 import sys
-from typing import Any, Callable, Dict, Iterator, Tuple
+from typing import Any, Callable, Dict, Iterator, List, Tuple, Union, cast
 
 # CODE BLOCK DELIMITER
 
 CodeBlockItem = Dict[str, Tuple[Tuple[Any, str, Any], str]]
+GenericItem = Union[
+    int, str, CodeBlockItem, List["GenericItem"], Dict[str, List["GenericItem"]]
+]
 
 # CODE BLOCK DELIMITER
 
@@ -28,6 +31,28 @@ def process_code_block(item: CodeBlockItem) -> str:
 
 # CODE BLOCK DELIMITER
 
+def is_jupyter_output_cell(items: List[GenericItem]) -> bool:
+    if len(items) < 2:
+        return False
+
+    item0 = items[0]
+    if not isinstance(item0, list):
+        return False
+
+    if len(item0) < 2:
+        return False
+
+    item1 = item0[1]
+    if not isinstance(item1, list):
+        return False
+
+    if len(item1) < 1:
+        return False
+
+    return item1[0] == "output"
+
+# CODE BLOCK DELIMITER
+
 def interleave(iterator: Iterator[str], value: str) -> Iterator[str]:
     first = True
     for item in iterator:
@@ -40,13 +65,35 @@ def interleave(iterator: Iterator[str], value: str) -> Iterator[str]:
 
 # CODE BLOCK DELIMITER
 
+def _tangle(item: GenericItem) -> Iterator[str]:
+    if isinstance(item, (int, str)):
+        return
+
+    if isinstance(item, list):
+        for subitem in item:
+            yield from _tangle(subitem)
+    else:  # dict
+        type_ = item.get("t")
+        if not type_:
+            return
+
+        if type_ == "CodeBlock":  # type: ignore
+            item = cast(CodeBlockItem, item)  # for mypy
+            res = process_code_block(item)
+            yield res
+        else:
+            item = cast(Dict[str, List[GenericItem]], item)  # for mypy
+            content: List[GenericItem] = item.get("c", [])
+            if is_jupyter_output_cell(content):
+                return
+
+            for subitem in content:
+                yield from _tangle(subitem)
+
+
 def tangle(source: str) -> Iterator[str]:
     for item in json.loads(source)["blocks"]:
-        if item["t"] != "CodeBlock":
-            continue
-
-        res = process_code_block(item)
-        yield res
+        yield from _tangle(item)
 
 # CODE BLOCK DELIMITER
 
