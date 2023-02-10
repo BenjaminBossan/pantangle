@@ -72,7 +72,7 @@ inputs = [
 
     (
         "ipynb",
-        """
+        r"""
         {
            "cells" : [
               {
